@@ -48,7 +48,7 @@ class VAE(nn.Module):
 
     def encode(self, x):
         h1 = F.relu(self.fc1(x))
-        return self.fc21(h1), self.fc22(h1)
+        return self.fc21(h1), self.fc21(h1)
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5*logvar)
@@ -60,7 +60,10 @@ class VAE(nn.Module):
         return torch.sigmoid(self.fc4(h3))
 
     def forward(self, x):
-        mu, logvar = self.encode(x.view(-1, 784))
+        mu1, mu2 = self.encode(x.view(-1, 784))
+        logvar = (mu1 - mu2).pow(2)
+        mu=mu1
+        #mu = torch.div(torch.add(mu1 , mu2), 2)
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
 
